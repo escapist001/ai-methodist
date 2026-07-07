@@ -42,7 +42,12 @@ async def generate(req: GenRequest):
     try:
         text = llm.generate(SYSTEM_PROMPT, user_prompt)
     except Exception as exc:  # не роняем UI на ошибке провайдера
-        return JSONResponse({"error": f"Ошибка генерации: {exc}"}, status_code=502)
+        # детали — только в лог сервера, клиенту общее сообщение (без утечки внутренностей)
+        print(f"[generate] ошибка: {exc!r}")
+        return JSONResponse(
+            {"error": "Не удалось сгенерировать материал. Попробуйте ещё раз позже."},
+            status_code=502,
+        )
 
     return {"markdown": text, "live": llm.is_live()}
 
