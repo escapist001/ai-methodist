@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI-ассистент методиста · физика · ФГОС</title>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<style>
+  :root {
+    --bg:#f5f2ec; --panel:#fffdf9; --ink:#2b2620; --muted:#8a8175;
+    --line:#e6e0d5; --accent:#b4442f; --accent-soft:#f3e2dd; --ok:#4a8a4a;
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,"Segoe UI",Roboto,sans-serif; line-height:1.55;
+  }
+  header {
+    padding:26px 28px; border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+    background:linear-gradient(180deg,#fbf8f2,var(--bg));
+  }
+  .logo { width:44px;height:44px;border-radius:12px;background:var(--accent);
+    color:#fff;display:grid;place-items:center;font-size:22px;font-weight:700; }
+  h1 { font-family:Georgia,"Times New Roman",serif; font-size:22px; margin:0; }
+  .sub { font-size:13px; color:var(--muted); margin-top:2px; }
+  .badge { margin-left:auto; font-size:12px; font-weight:600; padding:6px 12px;
+    border-radius:20px; border:1px solid var(--line); background:#fff; }
+  .badge.live { color:var(--ok); border-color:#cfe6cf; background:#f0f8f0; }
+  .badge.demo { color:var(--accent); border-color:var(--accent-soft); background:var(--accent-soft); }
+
+  main { max-width:900px; margin:0 auto; padding:28px; }
+  .card { background:var(--panel); border:1px solid var(--line); border-radius:18px;
+    padding:22px; box-shadow:0 8px 30px rgba(0,0,0,.04); }
+  .row { display:flex; gap:14px; flex-wrap:wrap; }
+  .field { flex:1; min-width:150px; display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+  label { font-size:13px; font-weight:600; color:var(--muted); }
+  input,select { padding:11px 13px; border:1px solid var(--line); border-radius:11px;
+    font-size:15px; background:#fff; color:var(--ink); transition:border-color .2s,box-shadow .2s; }
+  input:focus,select:focus { outline:none; border-color:var(--accent);
+    box-shadow:0 0 0 3px var(--accent-soft); }
+  button { margin-top:4px; width:100%; padding:13px; border:none; border-radius:12px;
+    background:var(--accent); color:#fff; font-size:15px; font-weight:600; cursor:pointer;
+    transition:transform .12s, background .2s; }
+  button:hover:not(:disabled) { background:#9c3928; transform:translateY(-1px); }
+  button:disabled { opacity:.6; cursor:default; }
+
+  .result { margin-top:24px; }
+  .result-card { background:var(--panel); border:1px solid var(--line); border-radius:18px;
+    padding:26px 30px; animation:rise .4s cubic-bezier(.2,.8,.2,1); }
+  @keyframes rise { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:none;} }
+  .result-card h1,.result-card h2 { font-family:Georgia,serif; }
+  .result-card h1 { font-size:24px; margin-top:0; }
+  .result-card h2 { font-size:19px; border-bottom:1px solid var(--line); padding-bottom:6px; margin-top:26px; }
+  .result-card blockquote { border-left:3px solid var(--accent); margin:0 0 16px; padding:8px 14px;
+    background:var(--accent-soft); border-radius:0 8px 8px 0; color:#6a3a30; }
+  .result-card code { background:#f0ece3; padding:2px 6px; border-radius:5px; font-size:.92em; }
+  .result-card table { border-collapse:collapse; width:100%; margin:12px 0; }
+  .result-card th,.result-card td { border:1px solid var(--line); padding:8px 10px; text-align:left; }
+
+  .spinner { display:inline-block; width:16px;height:16px; border:2px solid rgba(255,255,255,.4);
+    border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; vertical-align:-3px; margin-right:8px; }
+  @keyframes spin { to{transform:rotate(360deg);} }
+  .err { color:var(--accent); font-weight:600; margin-top:16px; }
+  .hint { font-size:12px; color:var(--muted); margin-top:10px; }
+
+  @media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important;} }
+</style>
+</head>
+<body>
+  <header>
+    <div class="logo">物</div>
+    <div>
+      <h1>AI-ассистент методиста</h1>
+      <div class="sub">Методические материалы по физике под ФГОС — за пару секунд</div>
+    </div>
+    <span class="badge" id="badge">…</span>
+  </header>
+
+  <main>
+    <div class="card">
+      <div class="row">
+        <div class="field" style="flex:2;">
+          <label for="topic">Тема</label>
+          <input id="topic" placeholder="например: Закон всемирного тяготения" />
+        </div>
+        <div class="field">
+          <label for="grade">Класс</label>
+          <select id="grade">
+            <option>7</option><option>8</option><option>9</option>
+            <option>10</option><option>11</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="type">Тип материала</label>
+        <select id="type">
+          <option value="lesson">Конспект урока</option>
+          <option value="test">Проверочная работа</option>
+          <option value="lab">Лабораторная работа</option>
+        </select>
+      </div>
+      <button id="go">Сгенерировать материал</button>
+      <div class="hint">Планируемые результаты по ФГОС (предметные, метапредметные, личностные) — включены автоматически.</div>
+    </div>
+
+    <div class="result" id="result"></div>
+  </main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+
+async function refreshBadge(){
+  try{
+    const r = await fetch('/api/status'); const s = await r.json();
+    const b = $('badge');
+    if(s.live){ b.className='badge live'; b.textContent='● Claude '+ (s.model||''); }
+    else { b.className='badge demo'; b.textContent='● Демо-режим (без ключа)'; }
+  }catch{ $('badge').textContent=''; }
+}
+refreshBadge();
+
+$('go').addEventListener('click', async () => {
+  const topic = $('topic').value.trim();
+  const result = $('result');
+  if(!topic){ result.innerHTML = '<div class="err">Укажите тему материала.</div>'; return; }
+
+  const btn = $('go');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Генерирую…';
+  result.innerHTML = '';
+
+  try{
+    const r = await fetch('/api/generate', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ topic, grade: $('grade').value, material_type: $('type').value })
+    });
+    const data = await r.json();
+    if(!r.ok){ result.innerHTML = '<div class="err">'+(data.error||'Ошибка')+'</div>'; }
+    else {
+      result.innerHTML = '<div class="result-card">'+ marked.parse(data.markdown) +'</div>';
+    }
+  }catch(e){
+    result.innerHTML = '<div class="err">Сеть недоступна: '+e.message+'</div>';
+  }finally{
+    btn.disabled = false;
+    btn.textContent = 'Сгенерировать материал';
+  }
+});
+</script>
+</body>
+</html>
