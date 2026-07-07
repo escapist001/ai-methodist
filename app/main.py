@@ -8,7 +8,7 @@
 from pathlib import Path
 
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
@@ -50,6 +50,26 @@ async def generate(req: GenRequest):
         )
 
     return {"markdown": text, "live": llm.is_live()}
+
+
+@app.post("/api/generate_stream")
+async def generate_stream(req: GenRequest):
+    """Потоковая генерация: материал печатается на экране по мере готовности."""
+    topic = req.topic.strip()
+    if not topic:
+        return JSONResponse({"error": "Укажите тему материала."}, status_code=400)
+
+    user_prompt = build_user_prompt(topic, req.grade, req.material_type)
+
+    def body():
+        try:
+            for chunk in llm.stream_generate(SYSTEM_PROMPT, user_prompt):
+                yield chunk
+        except Exception as exc:  # не роняем поток — сообщаем аккуратно в конце
+            print(f"[generate_stream] ошибка: {exc!r}")
+            yield "\n\n> ⚠️ Генерация прервана. Попробуйте ещё раз."
+
+    return StreamingResponse(body(), media_type="text/plain; charset=utf-8")
 
 
 app.mount("/", StaticFiles(directory=str(WEB_DIR), html=True), name="web")

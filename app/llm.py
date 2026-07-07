@@ -10,6 +10,8 @@
 """
 
 import os
+import re
+import time
 
 MODEL = "claude-opus-4-8"  # актуальная модель Claude на момент разработки
 
@@ -41,6 +43,34 @@ def generate(system: str, user: str) -> str:
         message = stream.get_final_message()
 
     return "".join(block.text for block in message.content if block.type == "text")
+
+
+def stream_generate(system: str, user: str):
+    """Потоковая генерация: отдаём материал кусками по мере готовности.
+
+    Live — токены Claude по мере ответа модели (эффект набора текста и защита
+    от таймаутов на длинных материалах). Demo — заглушку «печатаем» по словам.
+    """
+    if not is_live():
+        yield from _demo_stream(user)
+        return
+
+    client = anthropic.Anthropic()
+    with client.messages.stream(
+        model=MODEL,
+        max_tokens=8000,
+        system=system,
+        messages=[{"role": "user", "content": user}],
+    ) as stream:
+        for text in stream.text_stream:
+            yield text
+
+
+def _demo_stream(user: str):
+    """«Печатаем» демо-заглушку по словам — чтобы эффект набора работал без ключа."""
+    for token in re.findall(r"\S+\s*|\n", _demo(user)):
+        yield token
+        time.sleep(0.012)
 
 
 def _demo(user: str) -> str:
