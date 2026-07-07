@@ -4,80 +4,104 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>AI-ассистент методиста · физика · ФГОС</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <style>
-  :root {
-    --bg:#f5f2ec; --panel:#fffdf9; --ink:#2b2620; --muted:#8a8175;
-    --line:#e6e0d5; --accent:#b4442f; --accent-soft:#f3e2dd; --ok:#4a8a4a;
+  :root{
+    --paper:#fcfcfa; --grid:#e7eaf1; --ink:#16203a; --muted:#5e6884;
+    --accent:#2b4cd4; --accent-hover:#1e3aae; --accent-soft:#e9edfc;
+    --card:#ffffff; --line:#e5e9f2; --green:#2e7d46; --amber:#a86400;
   }
-  * { box-sizing:border-box; }
-  body {
-    margin:0; background:var(--bg); color:var(--ink);
-    font-family:-apple-system,"Segoe UI",Roboto,sans-serif; line-height:1.55;
+  *{box-sizing:border-box;}
+  body{
+    margin:0; color:var(--ink); background:var(--paper);
+    font-family:"IBM Plex Sans",-apple-system,sans-serif; -webkit-font-smoothing:antialiased;
+    /* Сигнатура: фон «в клетку» — тетрадь по физике */
+    background-image:linear-gradient(var(--grid) 1px,transparent 1px),
+                     linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+    background-size:26px 26px;
   }
-  header {
-    padding:26px 28px; border-bottom:1px solid var(--line);
-    display:flex; align-items:center; gap:14px; flex-wrap:wrap;
-    background:linear-gradient(180deg,#fbf8f2,var(--bg));
+  .serif{ font-family:"Newsreader",Georgia,serif; }
+  .mono{ font-family:"IBM Plex Mono",monospace; }
+
+  header{
+    border-bottom:1px solid var(--line); background:rgba(252,252,250,.86);
+    backdrop-filter:blur(6px); position:sticky; top:0; z-index:5;
+    padding:20px 28px; display:flex; align-items:center; gap:16px; flex-wrap:wrap;
   }
-  .logo { width:44px;height:44px;border-radius:12px;background:var(--accent);
-    color:#fff;display:grid;place-items:center;font-size:22px;font-weight:700; }
-  h1 { font-family:Georgia,"Times New Roman",serif; font-size:22px; margin:0; }
-  .sub { font-size:13px; color:var(--muted); margin-top:2px; }
-  .badge { margin-left:auto; font-size:12px; font-weight:600; padding:6px 12px;
-    border-radius:20px; border:1px solid var(--line); background:#fff; }
-  .badge.live { color:var(--ok); border-color:#cfe6cf; background:#f0f8f0; }
-  .badge.demo { color:var(--accent); border-color:var(--accent-soft); background:var(--accent-soft); }
+  .mark{ width:48px;height:48px;border-radius:12px; background:var(--ink); color:#fff;
+    display:grid; place-items:center; font-size:26px; font-family:"Newsreader",serif; }
+  h1{ font-family:"Newsreader",serif; font-weight:600; font-size:24px; margin:0; letter-spacing:-.2px; }
+  .eyebrow{ font-size:11px; letter-spacing:2.5px; text-transform:uppercase; color:var(--muted); margin-bottom:3px; }
+  .badge{ margin-left:auto; font-size:12px; font-weight:600; padding:7px 13px; border-radius:20px;
+    border:1px solid var(--line); background:#fff; display:flex; align-items:center; gap:7px; }
+  .badge .d{ width:7px;height:7px;border-radius:50%; background:var(--muted); }
+  .badge.live{ color:var(--green); border-color:#cfe6d5; background:#f1f8f3; } .badge.live .d{ background:var(--green); }
+  .badge.demo{ color:var(--amber); border-color:#efe1c5; background:#fbf4e6; } .badge.demo .d{ background:var(--amber); }
 
-  main { max-width:900px; margin:0 auto; padding:28px; }
-  .card { background:var(--panel); border:1px solid var(--line); border-radius:18px;
-    padding:22px; box-shadow:0 8px 30px rgba(0,0,0,.04); }
-  .row { display:flex; gap:14px; flex-wrap:wrap; }
-  .field { flex:1; min-width:150px; display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
-  label { font-size:13px; font-weight:600; color:var(--muted); }
-  input,select { padding:11px 13px; border:1px solid var(--line); border-radius:11px;
-    font-size:15px; background:#fff; color:var(--ink); transition:border-color .2s,box-shadow .2s; }
-  input:focus,select:focus { outline:none; border-color:var(--accent);
-    box-shadow:0 0 0 3px var(--accent-soft); }
-  button { margin-top:4px; width:100%; padding:13px; border:none; border-radius:12px;
-    background:var(--accent); color:#fff; font-size:15px; font-weight:600; cursor:pointer;
-    transition:transform .12s, background .2s; }
-  button:hover:not(:disabled) { background:#9c3928; transform:translateY(-1px); }
-  button:disabled { opacity:.6; cursor:default; }
+  main{ max-width:880px; margin:0 auto; padding:34px 28px 70px; }
+  .lead{ font-family:"Newsreader",serif; font-size:30px; line-height:1.2; letter-spacing:-.4px; margin:0 0 6px; }
+  .lead em{ color:var(--accent); font-style:italic; }
+  .sub{ color:var(--muted); font-size:15px; margin:0 0 26px; max-width:60ch; }
 
-  .result { margin-top:24px; }
-  .result-card { background:var(--panel); border:1px solid var(--line); border-radius:18px;
-    padding:26px 30px; animation:rise .4s cubic-bezier(.2,.8,.2,1); }
-  @keyframes rise { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:none;} }
-  .result-card h1,.result-card h2 { font-family:Georgia,serif; }
-  .result-card h1 { font-size:24px; margin-top:0; }
-  .result-card h2 { font-size:19px; border-bottom:1px solid var(--line); padding-bottom:6px; margin-top:26px; }
-  .result-card blockquote { border-left:3px solid var(--accent); margin:0 0 16px; padding:8px 14px;
-    background:var(--accent-soft); border-radius:0 8px 8px 0; color:#6a3a30; }
-  .result-card code { background:#f0ece3; padding:2px 6px; border-radius:5px; font-size:.92em; }
-  .result-card table { border-collapse:collapse; width:100%; margin:12px 0; }
-  .result-card th,.result-card td { border:1px solid var(--line); padding:8px 10px; text-align:left; }
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:16px; padding:22px;
+    box-shadow:0 1px 0 rgba(22,32,58,.03), 0 12px 34px rgba(22,32,58,.05); }
+  .row{ display:flex; gap:16px; flex-wrap:wrap; }
+  .field{ flex:1; min-width:160px; display:flex; flex-direction:column; gap:7px; margin-bottom:16px; }
+  label{ font-size:12px; font-weight:600; letter-spacing:.6px; text-transform:uppercase; color:var(--muted); }
+  input,select{ padding:12px 14px; border:1px solid var(--line); border-radius:11px; font-size:15px;
+    background:#fff; color:var(--ink); font-family:inherit; transition:border-color .2s, box-shadow .2s; }
+  input:focus,select:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
+  button{ width:100%; margin-top:4px; padding:14px; border:none; border-radius:12px; cursor:pointer;
+    background:var(--accent); color:#fff; font-size:15px; font-weight:600; font-family:inherit;
+    transition:background .2s, transform .12s; }
+  button:hover:not(:disabled){ background:var(--accent-hover); transform:translateY(-1px); }
+  button:disabled{ opacity:.6; cursor:default; }
+  .hint{ font-size:12px; color:var(--muted); margin-top:11px; line-height:1.5; }
 
-  .spinner { display:inline-block; width:16px;height:16px; border:2px solid rgba(255,255,255,.4);
-    border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; vertical-align:-3px; margin-right:8px; }
-  @keyframes spin { to{transform:rotate(360deg);} }
-  .err { color:var(--accent); font-weight:600; margin-top:16px; }
-  .hint { font-size:12px; color:var(--muted); margin-top:10px; }
+  .result{ margin-top:26px; }
+  /* Результат как рабочий лист: чернильная поля-линия слева */
+  .sheet{ background:var(--card); border:1px solid var(--line); border-left:3px solid var(--accent);
+    border-radius:4px 16px 16px 4px; padding:28px 32px; animation:rise .4s cubic-bezier(.2,.8,.2,1); }
+  @keyframes rise{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:none;} }
+  .sheet h1,.sheet h2{ font-family:"Newsreader",serif; letter-spacing:-.2px; }
+  .sheet h1{ font-size:26px; margin-top:0; } .sheet h2{ font-size:20px; margin-top:26px;
+    border-bottom:1px solid var(--line); padding-bottom:6px; }
+  .sheet p,.sheet li{ line-height:1.6; }
+  .sheet blockquote{ border-left:3px solid var(--amber); margin:0 0 18px; padding:10px 16px;
+    background:#fbf4e6; border-radius:0 8px 8px 0; color:#6c4a12; }
+  .sheet code{ font-family:"IBM Plex Mono",monospace; background:var(--accent-soft); color:var(--accent-hover);
+    padding:2px 6px; border-radius:5px; font-size:.92em; }
+  .sheet table{ border-collapse:collapse; width:100%; margin:14px 0; }
+  .sheet th,.sheet td{ border:1px solid var(--line); padding:9px 11px; text-align:left; }
+  .sheet th{ background:#f6f8fc; }
 
-  @media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important;} }
+  .spinner{ display:inline-block; width:16px;height:16px; border:2px solid rgba(255,255,255,.4);
+    border-top-color:#fff; border-radius:50%; animation:spin .7s linear infinite; vertical-align:-3px; margin-right:9px; }
+  @keyframes spin{ to{transform:rotate(360deg);} }
+  .err{ color:#b02a1f; font-weight:600; margin-top:18px; }
+
+  @media (max-width:560px){ .lead{font-size:24px;} }
+  @media (prefers-reduced-motion:reduce){ *{animation:none!important; transition:none!important;} }
 </style>
 </head>
 <body>
   <header>
-    <div class="logo">物</div>
+    <div class="mark serif">物</div>
     <div>
+      <div class="eyebrow">Методика · Физика · ФГОС</div>
       <h1>AI-ассистент методиста</h1>
-      <div class="sub">Методические материалы по физике под ФГОС — за пару секунд</div>
     </div>
-    <span class="badge" id="badge">…</span>
+    <span class="badge" id="badge"><span class="d"></span>…</span>
   </header>
 
   <main>
+    <p class="lead serif">Методический материал <em>под ФГОС</em> — за пару секунд.</p>
+    <p class="sub">Задай тему, класс и тип. Планируемые результаты трёх видов, цель, задачи и этапы урока
+      модель соберёт в правильной структуре — останется вычитать и адаптировать под свой класс.</p>
+
     <div class="card">
       <div class="row">
         <div class="field" style="flex:2;">
@@ -86,10 +110,7 @@
         </div>
         <div class="field">
           <label for="grade">Класс</label>
-          <select id="grade">
-            <option>7</option><option>8</option><option>9</option>
-            <option>10</option><option>11</option>
-          </select>
+          <select id="grade"><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option></select>
         </div>
       </div>
       <div class="field">
@@ -101,51 +122,37 @@
         </select>
       </div>
       <button id="go">Сгенерировать материал</button>
-      <div class="hint">Планируемые результаты по ФГОС (предметные, метапредметные, личностные) — включены автоматически.</div>
+      <div class="hint">Планируемые результаты по ФГОС (предметные, метапредметные, личностные) включаются автоматически.</div>
     </div>
 
     <div class="result" id="result"></div>
   </main>
 
 <script>
-const $ = (id) => document.getElementById(id);
+const $=(id)=>document.getElementById(id);
 
 async function refreshBadge(){
   try{
-    const r = await fetch('/api/status'); const s = await r.json();
+    const s = await (await fetch('/api/status')).json();
     const b = $('badge');
-    if(s.live){ b.className='badge live'; b.textContent='● Claude '+ (s.model||''); }
-    else { b.className='badge demo'; b.textContent='● Демо-режим (без ключа)'; }
+    if(s.live){ b.className='badge live'; b.innerHTML='<span class="d"></span>Claude '+(s.model||''); }
+    else{ b.className='badge demo'; b.innerHTML='<span class="d"></span>Демо-режим (без ключа)'; }
   }catch{ $('badge').textContent=''; }
 }
 refreshBadge();
 
-$('go').addEventListener('click', async () => {
-  const topic = $('topic').value.trim();
-  const result = $('result');
-  if(!topic){ result.innerHTML = '<div class="err">Укажите тему материала.</div>'; return; }
-
-  const btn = $('go');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Генерирую…';
-  result.innerHTML = '';
-
+$('go').addEventListener('click', async ()=>{
+  const topic=$('topic').value.trim(), result=$('result');
+  if(!topic){ result.innerHTML='<div class="err">Укажите тему материала.</div>'; return; }
+  const btn=$('go'); btn.disabled=true; btn.innerHTML='<span class="spinner"></span>Генерирую…'; result.innerHTML='';
   try{
-    const r = await fetch('/api/generate', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ topic, grade: $('grade').value, material_type: $('type').value })
-    });
+    const r = await fetch('/api/generate',{ method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ topic, grade:$('grade').value, material_type:$('type').value }) });
     const data = await r.json();
-    if(!r.ok){ result.innerHTML = '<div class="err">'+(data.error||'Ошибка')+'</div>'; }
-    else {
-      result.innerHTML = '<div class="result-card">'+ marked.parse(data.markdown) +'</div>';
-    }
-  }catch(e){
-    result.innerHTML = '<div class="err">Сеть недоступна: '+e.message+'</div>';
-  }finally{
-    btn.disabled = false;
-    btn.textContent = 'Сгенерировать материал';
-  }
+    if(!r.ok){ result.innerHTML='<div class="err">'+(data.error||'Ошибка')+'</div>'; }
+    else{ result.innerHTML='<div class="sheet">'+marked.parse(data.markdown)+'</div>'; }
+  }catch(e){ result.innerHTML='<div class="err">Сеть недоступна: '+e.message+'</div>'; }
+  finally{ btn.disabled=false; btn.textContent='Сгенерировать материал'; }
 });
 </script>
 </body>
